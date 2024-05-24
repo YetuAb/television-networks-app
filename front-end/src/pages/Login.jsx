@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';  // import useNavigate
 import { Box, Grid, Typography, TextField, Button, useMediaQuery, useTheme, InputAdornment } from '@mui/material';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import PersonIcon from '@mui/icons-material/PersonOutlined';
 import axios from 'axios';
-import Logo from '../assets/images/Logo.png';
-
+import LoginLogo from '../assets/images/LoginLogo.png';
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -12,6 +12,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();  
 
   const handleSubmit = async () => {
     try {
@@ -21,9 +22,14 @@ const Login = () => {
       console.log('Login successful');
       console.log('Login response:', response.data);
       if (response.data.isVerified) {
+        const userType = response.data.userType;
         window.localStorage.setItem('token', response.data.message);
         window.localStorage.setItem('loggedIn', true);
-        window.location.href = '/admin';
+        if (userType === 'Admin') {
+          navigate('/admin');  
+        } else if (userType === 'Customer') {
+          navigate('/homepage');  
+        }
       } else {
         alert(response.data.message);
       }
@@ -51,7 +57,7 @@ const Login = () => {
     <Grid container sx={{ height: '100vh' }}>
       <Grid item xs={12} sm={6} sx={{ backgroundColor: 'black', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box p={4}>
-          <img src={Logo} alt="Logo" style={{ height: '240px', marginLeft: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', my: 1 }} />
+          <img src={LoginLogo} alt="Logo" style={{ height: '240px', marginLeft: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', my: 1 }} />
           <Typography variant="h1" color="white" fontFamily="sans-serif">T-Movie</Typography>
         </Box>
       </Grid>
