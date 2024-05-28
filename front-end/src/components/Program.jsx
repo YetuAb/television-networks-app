@@ -90,6 +90,7 @@ const Program = () => {
       handleDialogClose();
     } catch (error) {
       console.error('Error saving program:', error);
+      console.log(error);
     }
   };
 

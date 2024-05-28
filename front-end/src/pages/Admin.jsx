@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Button, Menu, MenuItem } from '@mui/material';
-import { Dashboard as DashboardIcon, Tv as ChannelIcon, Movie as ProgramIcon, CloudDownload as ExportIcon, FilterList as FilterIcon, Notifications as NotificationsIcon, AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon } from '@mui/icons-material';
+import { Dashboard as DashboardIcon, Tv as ChannelIcon, Movie as ProgramIcon, CloudDownload as ExportIcon, FilterList as FilterIcon, Notifications as NotificationsIcon, AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, Filter } from '@mui/icons-material';
 import SearchBar from '../components/SearchBar';
 import DashboardLogo from '../assets/images/DashboardLogo.png';
 import axios from 'axios';
@@ -185,11 +185,22 @@ const Admin = () => {
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', bgcolor: '#fff', p: 1 }}>
           <SearchBar onSearch={handleSearch} />
-          <Button startIcon={<ExportIcon />} color="primary">Export</Button>
+          <Button variant='filled' startIcon={<ExportIcon />} color="primary">Export</Button>
+          <Button variant='filled' startIcon={<FilterIcon />} color="primary" >Add Filter</Button>
           {selectedSection === 'Dashboard' ? (
-            <Button startIcon={<FilterIcon />} color="primary">Add Filter</Button>
+            <Button variant="contained" 
+            sx={{
+              backgroundColor: '#000',
+              color: '#fff',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              fontSize: '16px',
+              '&:hover': {
+                backgroundColor: '#333',
+              },
+            }}>Add Filter</Button>
           ) : (
-            <Button startIcon={<FilterIcon />} color="primary" onClick={handleDialogOpen}>
+            <Button variant='filled' color="primary" onClick={handleDialogOpen}>
               {selectedSection === 'Channel' ? 'Add Channel' : 'Add Program'}
             </Button>
           )}

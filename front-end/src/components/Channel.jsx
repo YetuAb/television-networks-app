@@ -89,7 +89,6 @@ const Channel = () => {
 
   return (
     <Box>
-      <Typography variant="h4">Channels</Typography>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>

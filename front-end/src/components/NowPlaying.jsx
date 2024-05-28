@@ -17,11 +17,16 @@ const NowPlaying = () => {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching now playing program:', error);
+      setLoading(false);
     }
   };
 
   if (loading) {
     return <p>Loading...</p>;
+  }
+
+  if (!program) {
+    return <p>No currently playing program found.</p>;
   }
 
   return (
@@ -30,7 +35,7 @@ const NowPlaying = () => {
       <Typography variant="h4">{program.title}</Typography>
       <Typography>{program.description}</Typography>
       <Box sx={{ width: '100%', marginY: 2 }}>
-        <LinearProgress variant="determinate" value={program.progress} />
+        <LinearProgress variant="determinate" value={program.progress || 0} />
       </Box>
       <Button variant="contained" color="primary">Play</Button>
     </Box>

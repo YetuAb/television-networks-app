@@ -8,10 +8,7 @@ router.get('/', async (req, res) => {
   try {
     const nowPlaying = await prisma.program.findFirst({
       where: {
-        title: "Gray's Anatomy",
-      },
-      include: {
-        channel: true,
+        title: "Gray's Anatomy,"
       },
     });
 

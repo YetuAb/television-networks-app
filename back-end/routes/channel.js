@@ -4,36 +4,35 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-// Get all channels
 router.get('/', async (req, res) => {
   try {
     const channels = await prisma.channel.findMany();
     res.json(channels);
   } catch (error) {
     console.error('Error fetching channels:', error);
+    console.log(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Create a new channel
 router.post('/', async (req, res) => {
   try {
     const { name, status, hidden } = req.body;
     const newChannel = await prisma.channel.create({
       data: {
         name,
-        status: Boolean(status),  // Ensure status is a Boolean
-        hidden: Boolean(hidden)   // Ensure hidden is a Boolean
+        status: Boolean(status),  
+        hidden: Boolean(hidden)   
       },
     });
     res.json(newChannel);
   } catch (error) {
     console.error('Error creating channel:', error);
+    console.log(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Update a channel
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -42,18 +41,18 @@ router.put('/:id', async (req, res) => {
       where: { id: parseInt(id, 10) },
       data: {
         name,
-        status: Boolean(status),  // Ensure status is a Boolean
-        hidden: Boolean(hidden)   // Ensure hidden is a Boolean
+        status: Boolean(status),  
+        hidden: Boolean(hidden)   
       },
     });
     res.json(updatedChannel);
   } catch (error) {
     console.error('Error updating channel:', error);
+    console.log(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Delete a channel
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -63,6 +62,7 @@ router.delete('/:id', async (req, res) => {
     res.sendStatus(204);
   } catch (error) {
     console.error('Error deleting channel:', error);
+    console.log(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

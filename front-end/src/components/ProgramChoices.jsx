@@ -1,17 +1,24 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Grid, Paper, Typography } from '@mui/material';
 import liveTvIcon from '../assets/images/live-tv-icon.png';
 import moviesIcon from '../assets/images/movies-icon.png';
 import tvShowsIcon from '../assets/images/tv-shows-icon.png';
 import sportsIcon from '../assets/images/sports-icon.png';
 
-const ProgramChoices = ({ onChoiceSelect }) => {
+const ProgramChoices = () => {
+  const navigate = useNavigate();
+
   const choices = [
-    { name: 'Live TV', description: '+5000 Channels', image: liveTvIcon },
-    { name: 'Movies', description: '+500 Movies', image: moviesIcon },
-    { name: 'TV Shows', description: '+900 Series', image: tvShowsIcon },
-    { name: 'Sports', description: '+200 Channels', image: sportsIcon },
+    { name: 'Live TV', description: '+5000 Channels', image: liveTvIcon, route: '/livetv' },
+    { name: 'Movies', description: '+500 Movies', image: moviesIcon, route: '/movies' },
+    { name: 'TV Shows', description: '+900 Series', image: tvShowsIcon, route: '/tvshows' },
+    { name: 'Sports', description: '+200 Channels', image: sportsIcon, route: '/sports' },
   ];
+
+  const handleChoiceSelect = (route) => {
+    navigate(route);
+  };
 
   return (
     <Grid container spacing={2}>
@@ -25,7 +32,7 @@ const ProgramChoices = ({ onChoiceSelect }) => {
               marginTop: 10,
               color: 'white',
             }}
-            onClick={() => onChoiceSelect(choice.name)}
+            onClick={() => handleChoiceSelect(choice.route)}
           >
             <Box
               component="img"
@@ -40,8 +47,8 @@ const ProgramChoices = ({ onChoiceSelect }) => {
                 borderRadius: '4px',
               }}
             />
-            <Typography variant="subtitle1" sx={{ marginTop: 1, textAlign: 'start', }}>{choice.name}</Typography>
-            <Typography variant="subtitle2" sx={{ marginTop: 1, textAlign: 'start', }}>{choice.description}</Typography>
+            <Typography variant="subtitle1" sx={{ marginTop: 1, textAlign: 'start' }}>{choice.name}</Typography>
+            <Typography variant="subtitle2" sx={{ marginTop: 1, textAlign: 'start' }}>{choice.description}</Typography>
           </Paper>
         </Grid>
       ))}
