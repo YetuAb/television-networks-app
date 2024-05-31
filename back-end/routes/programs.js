@@ -68,4 +68,23 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+router.get('/search', async (req, res) => {
+  const query = req.query.query;
+  try {
+    const programs = await prisma.program.findMany({
+      where: {
+        title: {
+          contains: query,
+          mode: 'insensitive'
+        }
+      }
+    });
+    res.json(programs);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 module.exports = router;

@@ -67,4 +67,23 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+router.get('/search', async (req, res) => {
+  const query = req.query.query || '';
+  try {
+    const channels = await prisma.channel.findMany({
+      where: {
+        name: {
+          contains: query,
+          mode: 'insensitive'
+        }
+      }
+    });
+    res.json(channels);
+  } catch (error) {
+    console.error('Error searching channels:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 module.exports = router;

@@ -1,24 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Switch, IconButton, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField,
-} from '@mui/material';
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
-  Check as CheckIcon,
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Switch, IconButton, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField } from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon, Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
 
-const Channel = () => {
+const Channel = ({ searchResults }) => {
   const [channels, setChannels] = useState([]);
   const [editingChannel, setEditingChannel] = useState(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    fetchChannels();
-  }, []);
+    if (searchResults.length === 0) {
+      fetchChannels();
+    } else {
+      setChannels(searchResults);
+    }
+  }, [searchResults]);
 
   const fetchChannels = async () => {
     try {
@@ -141,23 +137,16 @@ const Channel = () => {
       <Dialog open={open} onClose={handleDialogClose}>
         <DialogTitle>Edit Channel</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            To edit this channel, please change the name and status here.
-          </DialogContentText>
+          <DialogContentText>Update the channel details below:</DialogContentText>
           <TextField
             autoFocus
             margin="dense"
             name="name"
-            label="Name"
+            label="Channel Name"
             type="text"
             fullWidth
-            value={editingChannel ? editingChannel.name : ''}
+            value={editingChannel?.name || ''}
             onChange={handleInputChange}
-          />
-          <Switch
-            checked={editingChannel ? editingChannel.status : false}
-            onChange={() => setEditingChannel((prev) => ({ ...prev, status: !prev.status }))}
-            color="primary"
           />
         </DialogContent>
         <DialogActions>

@@ -1,26 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Switch,Dialog,DialogTitle,DialogContent,DialogActions,Button,TextField
-} from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Switch, IconButton, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField } from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon, Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
 
-const Program = () => {
+const Program = ({ searchResults }) => {
   const [programs, setPrograms] = useState([]);
   const [editingProgram, setEditingProgram] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [formValues, setFormValues] = useState({
-    id: '',
-    title: '',
-    duration: '',
-    description: '',
-    status: false,
-    videoUrl: ''
-  });
 
   useEffect(() => {
-    fetchPrograms();
-  }, []);
-  
+    if (searchResults.length === 0) {
+      fetchPrograms();
+    } else {
+      setPrograms(searchResults);
+    }
+  }, [searchResults]);
+
   const fetchPrograms = async () => {
     try {
       const response = await axios.get('http://localhost:5000/programs');
@@ -29,17 +24,17 @@ const Program = () => {
       console.error('Error fetching programs:', error);
     }
   };
-  
-  const handleToggleStatus = async (id, currentStatus) => {
+
+  const toggleProgramStatus = async (id, currentStatus) => {
     try {
       await axios.put(`http://localhost:5000/programs/${id}`, { status: !currentStatus });
       fetchPrograms();
     } catch (error) {
-      console.error('Error updating status:', error);
+      console.error('Error toggling program status:', error);
     }
   };
 
-  const handleDelete = async (id) => {
+  const deleteProgram = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/programs/${id}`);
       fetchPrograms();
@@ -48,27 +43,9 @@ const Program = () => {
     }
   };
 
-  const handleEdit = (program) => {
+  const handleEditClick = (program) => {
     setEditingProgram(program);
-    setFormValues(program);
     setDialogOpen(true);
-  };
-
-  const handleToggleVisibility = async (id, currentStatus) => {
-    try {
-      await axios.put(`http://localhost:5000/programs/${id}`, { status: !currentStatus });
-      fetchPrograms();
-    } catch (error) {
-      console.error('Error updating visibility:', error);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormValues({
-      ...formValues,
-      [name]: value,
-    });
   };
 
   const handleDialogClose = () => {
@@ -76,61 +53,87 @@ const Program = () => {
     setEditingProgram(null);
   };
 
-  const handleSave = async () => {
+  const handleDialogSave = async () => {
     try {
-      const { id, title, duration, description, status, videoUrl } = formValues;
-      await axios.put(`http://localhost:5000/programs/${id}`, {
-        title,
-        duration,
-        description,
-        status,
-        videoUrl
+      await axios.put(`http://localhost:5000/programs/${editingProgram.id}`, {
+        title: editingProgram.title,
+        duration: editingProgram.duration,
+        description: editingProgram.description,
+        status: editingProgram.status,
+        videoUrl: editingProgram.videoUrl,
       });
       fetchPrograms();
       handleDialogClose();
     } catch (error) {
-      console.error('Error saving program:', error);
-      console.log(error);
+      console.error('Error updating program:', error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditingProgram((prevProgram) => ({
+      ...prevProgram,
+      [name]: value,
+    }));
+  };
+
+  const toggleVisibility = async (id, currentVisibility) => {
+    try {
+      await axios.put(`http://localhost:5000/programs/${id}`, { hidden: !currentVisibility });
+      fetchPrograms();
+    } catch (error) {
+      console.error('Error toggling program visibility:', error);
     }
   };
 
   return (
-    <>
+    <Box>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Id</TableCell>
               <TableCell>Title</TableCell>
               <TableCell>Duration</TableCell>
               <TableCell>Description</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell>Action</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {programs.map((program) => (
               <TableRow key={program.id}>
-                <TableCell>{program.id}</TableCell>
                 <TableCell>{program.title}</TableCell>
                 <TableCell>{program.duration}</TableCell>
                 <TableCell>{program.description}</TableCell>
                 <TableCell>
-                  <Switch
-                    checked={program.status}
-                    onChange={() => handleToggleStatus(program.id, program.status)}
-                  />
+                  <Box display="flex" alignItems="center">
+                    {program.status ? <CheckIcon color="primary" /> : <CloseIcon color="error" />}
+                    <Typography variant="body2" color={program.status ? 'primary' : 'error'}>
+                      {program.status ? 'Active' : 'Deactive'}
+                    </Typography>
+                    <Switch
+                      checked={program.status}
+                      onChange={() => toggleProgramStatus(program.id, program.status)}
+                      color="primary"
+                    />
+                  </Box>
                 </TableCell>
                 <TableCell>
-                  <IconButton onClick={() => handleToggleVisibility(program.id, program.status)}>
-                    {program.status ? <VisibilityOffIcon  /> : <VisibilityIcon />}
-                  </IconButton>
-                  <IconButton onClick={() => handleEdit(program)}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleDelete(program.id)}>
-                    <DeleteIcon sx={{color:'red'}}/>
-                  </IconButton>
+                  <Tooltip title={program.hidden ? 'Unhide' : 'Hide'}>
+                    <IconButton onClick={() => toggleVisibility(program.id, program.hidden)}>
+                      {program.hidden ? <VisibilityOffIcon color="action" /> : <VisibilityIcon color="action" />}
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Edit">
+                    <IconButton onClick={() => handleEditClick(program)}>
+                      <EditIcon color="primary" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <IconButton onClick={() => deleteProgram(program.id)}>
+                      <DeleteIcon color="error" />
+                    </IconButton>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
@@ -141,54 +144,55 @@ const Program = () => {
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Edit Program</DialogTitle>
         <DialogContent>
+          <DialogContentText>Update the program details below:</DialogContentText>
           <TextField
+            autoFocus
             margin="dense"
-            label="Title"
             name="title"
-            value={formValues.title}
-            onChange={handleInputChange}
+            label="Title"
+            type="text"
             fullWidth
+            value={editingProgram?.title || ''}
+            onChange={handleInputChange}
           />
           <TextField
             margin="dense"
-            label="Duration"
             name="duration"
-            value={formValues.duration}
-            onChange={handleInputChange}
+            label="Duration"
+            type="text"
             fullWidth
+            value={editingProgram?.duration || ''}
+            onChange={handleInputChange}
           />
           <TextField
             margin="dense"
-            label="Description"
             name="description"
-            value={formValues.description}
-            onChange={handleInputChange}
+            label="Description"
+            type="text"
             fullWidth
+            value={editingProgram?.description || ''}
+            onChange={handleInputChange}
           />
           <TextField
             margin="dense"
-            label="Video URL"
             name="videoUrl"
-            value={formValues.videoUrl}
-            onChange={handleInputChange}
+            label="Video URL"
+            type="text"
             fullWidth
-          />
-          <Switch
-            checked={formValues.status}
-            onChange={(e) => setFormValues({ ...formValues, status: e.target.checked })}
-            name="status"
+            value={editingProgram?.videoUrl || ''}
+            onChange={handleInputChange}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleSave} color="primary">
+          <Button onClick={handleDialogSave} color="primary">
             Save
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   );
 };
 

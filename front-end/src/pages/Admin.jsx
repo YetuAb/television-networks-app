@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Button, Menu, MenuItem } from '@mui/material';
-import { Dashboard as DashboardIcon, Tv as ChannelIcon, Movie as ProgramIcon, CloudDownload as ExportIcon, FilterList as FilterIcon, Notifications as NotificationsIcon, AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, Filter } from '@mui/icons-material';
+import { Dashboard as DashboardIcon, Tv as ChannelIcon, Movie as ProgramIcon, CloudDownload as ExportIcon, FilterList as FilterIcon, Notifications as NotificationsIcon, AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon } from '@mui/icons-material';
 import SearchBar from '../components/SearchBar';
 import DashboardLogo from '../assets/images/DashboardLogo.png';
 import axios from 'axios';
@@ -24,6 +24,7 @@ const Admin = () => {
     description: '',
     videoUrl: '',
   });
+  const [searchResults, setSearchResults] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -64,8 +65,16 @@ const Admin = () => {
     setSelectedSection(section);
   };
 
-  const handleSearch = (query) => {
-    console.log('Search query:', query);
+  const handleSearch = async (query) => {
+    try {
+      const endpoint = selectedSection === 'Channel' ? 'channel/search' : 'programs/search';
+      const response = await axios.get(`http://localhost:5000/${endpoint}`, {
+        params: { query },
+      });
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error('Error searching:', error);
+    }
   };
 
   const handleMenuClick = (event) => {
@@ -139,15 +148,57 @@ const Admin = () => {
           <Typography variant="h6">T-Movie</Typography>
         </Box>
         <List>
-          <ListItem button key="Dashboard" selected={selectedSection === 'Dashboard'} onClick={() => handleSectionClick('Dashboard')} sx={{ ...(selectedSection === 'Dashboard' && { backgroundColor: '#000222', color: 'white' }) }}>
+          <ListItem
+            button
+            key="Dashboard"
+            selected={selectedSection === 'Dashboard'}
+            onClick={() => handleSectionClick('Dashboard')}
+            sx={{
+              ...(selectedSection === 'Dashboard' && {
+                backgroundColor: '#000222',
+                color: 'white',
+                '& .MuiListItemIcon-root': {
+                  color: 'white',
+                },
+              }),
+            }}
+          >
             <ListItemIcon><DashboardIcon /></ListItemIcon>
             <ListItemText primary="Dashboard" />
           </ListItem>
-          <ListItem button key="Channel" selected={selectedSection === 'Channel'} onClick={() => handleSectionClick('Channel')}>
+          <ListItem
+            button
+            key="Channel"
+            selected={selectedSection === 'Channel'}
+            onClick={() => handleSectionClick('Channel')}
+            sx={{
+              ...(selectedSection === 'Channel' && {
+                backgroundColor: '#000222',
+                color: 'white',
+                '& .MuiListItemIcon-root': {
+                  color: 'white',
+                },
+              }),
+            }}
+          >
             <ListItemIcon><ChannelIcon /></ListItemIcon>
             <ListItemText primary="Channel" />
           </ListItem>
-          <ListItem button key="Program" selected={selectedSection === 'Program'} onClick={() => handleSectionClick('Program')}>
+          <ListItem
+            button
+            key="Program"
+            selected={selectedSection === 'Program'}
+            onClick={() => handleSectionClick('Program')}
+            sx={{
+              ...(selectedSection === 'Program' && {
+                backgroundColor: '#000222',
+                color: 'white',
+                '& .MuiListItemIcon-root': {
+                  color: 'white',
+                },
+              }),
+            }}
+          >
             <ListItemIcon><ProgramIcon /></ListItemIcon>
             <ListItemText primary="Program" />
           </ListItem>
@@ -155,8 +206,8 @@ const Admin = () => {
       </Drawer>
       <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
         <Box component="main" sx={{ bgcolor: '#000222', p: 2, flexGrow: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6" sx={{ color: 'white', ml: 1, display: 'flex', justifyContent: 'flex-start', }}>{selectedSection}</Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: 1, }}>
+          <Typography variant="h6" sx={{ color: 'white', ml: 1 }}>{selectedSection}</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: 1 }}>
             <Button onClick={handleMenuClick}>
               <NotificationsIcon sx={{ color: 'white' }} />
             </Button>
@@ -186,7 +237,7 @@ const Admin = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', bgcolor: '#fff', p: 1 }}>
           <SearchBar onSearch={handleSearch} />
           <Button variant='filled' startIcon={<ExportIcon />} color="primary">Export</Button>
-          <Button variant='filled' startIcon={<FilterIcon />} color="primary" >Add Filter</Button>
+          <Button variant='filled' startIcon={<FilterIcon />} color="primary">Add Filter</Button>
           {selectedSection === 'Dashboard' ? (
             <Button variant="contained" 
             sx={{
@@ -200,14 +251,29 @@ const Admin = () => {
               },
             }}>Add Filter</Button>
           ) : (
-            <Button variant='filled' color="primary" onClick={handleDialogOpen}>
+            <Button 
+              sx={{
+              backgroundColor: '#000',
+              color: '#fff',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              fontSize: '16px',
+              '&:hover': {
+                backgroundColor: '#333',
+              },
+              }}
+              variant='filled' color="primary" onClick={handleDialogOpen}>
               {selectedSection === 'Channel' ? 'Add Channel' : 'Add Program'}
             </Button>
           )}
         </Box>
         {selectedSection === 'Dashboard' && <Dashboard />}
-        {selectedSection === 'Channel' && <Channel />}
-        {selectedSection === 'Program' && <Program/>}
+        {selectedSection === 'Channel' && (
+          <Channel searchResults={searchResults} /> // Pass searchResults as prop
+        )}
+        {selectedSection === 'Program' && (
+          <Program searchResults={searchResults} /> // Pass searchResults as prop
+        )}
       </Box>
       <AddDialog
         open={dialogOpen}
