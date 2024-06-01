@@ -109,7 +109,7 @@ const Admin = () => {
   const handleAddClick = async () => {
     try {
       if (selectedSection === 'Channel') {
-        await axios.post('http://localhost:5000/channels', {
+        await axios.post('http://localhost:5000/channel', {
           name: formValues.name,
           status: formValues.status,
           hidden: formValues.hidden,
@@ -269,10 +269,10 @@ const Admin = () => {
         </Box>
         {selectedSection === 'Dashboard' && <Dashboard />}
         {selectedSection === 'Channel' && (
-          <Channel searchResults={searchResults} /> // Pass searchResults as prop
+          <Channel searchResults={searchResults} /> 
         )}
         {selectedSection === 'Program' && (
-          <Program searchResults={searchResults} /> // Pass searchResults as prop
+          <Program searchResults={searchResults} /> 
         )}
       </Box>
       <AddDialog

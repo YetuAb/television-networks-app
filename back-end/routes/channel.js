@@ -37,6 +37,7 @@ router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, status, hidden } = req.body;
+    console.log(`Updating Channel ID: ${id}, Data: `, { name, status, hidden });
     const updatedChannel = await prisma.channel.update({
       where: { id: parseInt(id, 10) },
       data: {
