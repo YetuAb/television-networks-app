@@ -5,6 +5,7 @@ import NowPlaying from '../components/NowPlaying';
 import ProgramChoices from '../components/ProgramChoices';
 import Header from '../components/Header';
 import axios from 'axios';
+import ChannelList from '../components/ChannelList';
 
 
 const HomePage = () => {
@@ -46,6 +47,7 @@ const HomePage = () => {
   return (
     <Box sx={{ display: 'flex', backgroundColor: '#10112F', color: 'white'  }}>
       <Sidebar selectedMenu={selectedMenu} onMenuSelect={handleMenuSelect} />
+      <ChannelList/>
       <Container sx={{ flex: 1, padding: 4, position: 'relative' }}>
         <Header />
         <NowPlaying movie={nowPlaying} />
