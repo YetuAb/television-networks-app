@@ -28,6 +28,8 @@ model Program {
   description String
   status      Boolean @default(true)
   videoUrl    String
+  category    String
+  type        String
 }
 
 model Channel {

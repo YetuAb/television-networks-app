@@ -8,26 +8,8 @@ module.exports = (io) => {
 
   router.get('/initial-data', async (req, res) => {
     try {
-      const systemUserCount = await prisma.user.count();
-      const programCount = await prisma.program.count();
-      const channelCount = await prisma.channel.count();
-      const programCategoryData = await prisma.program.groupBy({
-        by: ['category'],
-        _count: true,
-      });
-      const programTypeData = await prisma.program.groupBy({
-        by: ['type'],
-        _count: true,
-      });
-
-      io.emit('initialData', {
-        systemUserCount,
-        programCount,
-        channelCount,
-        programCategoryData,
-        programTypeData,
-      });
-
+      const initialData = await fetchInitialData();
+      io.emit('initialData', initialData);
       res.sendStatus(200);
     } catch (error) {
       console.error('Error fetching initial data:', error);
@@ -37,28 +19,8 @@ module.exports = (io) => {
 
   router.post('/update-data', async (req, res) => {
     try {
-      const systemUserCount = await prisma.user.count();
-      const programCount = await prisma.program.count();
-      const channelCount = await prisma.channel.count();
-      const programCategoryData = await prisma.program.groupBy({
-        by: ['category'],
-        _count: true,
-      });
-      const programTypeData = await prisma.program.groupBy({
-        by: ['type'],
-        _count: true,
-      });
-
-      const updatedData = {
-        systemUserCount,
-        programCount,
-        channelCount,
-        programCategoryData,
-        programTypeData,
-      };
-
+      const updatedData = await fetchInitialData();
       io.emit('updateData', updatedData);
-
       res.sendStatus(200);
     } catch (error) {
       console.error('Error updating data:', error);
@@ -67,4 +29,40 @@ module.exports = (io) => {
   });
 
   return router;
+};
+
+const fetchInitialData = async () => {
+  const systemUserCount = await prisma.user.count();
+  const programCount = await prisma.program.count();
+  const channelCount = await prisma.channel.count();
+  const programCategoryData = await prisma.program.groupBy({
+    by: ['category'],
+    _count: {
+      category: true,
+    },
+  });
+  const programTypeData = await prisma.program.groupBy({
+    by: ['type'],
+    _count: {
+      type: true,
+    },
+  });
+
+  const transformedCategoryData = programCategoryData.map(data => ({
+    category: data.category,
+    count: data._count.category,
+  }));
+
+  const transformedTypeData = programTypeData.map(data => ({
+    type: data.type,
+    count: data._count.type,
+  }));
+
+  return {
+    systemUserCount,
+    programCount,
+    channelCount,
+    programCategoryData: transformedCategoryData,
+    programTypeData: transformedTypeData,
+  };
 };
