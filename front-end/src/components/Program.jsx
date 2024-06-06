@@ -34,6 +34,15 @@ const Program = ({ searchResults }) => {
     }
   };
 
+  const toggleVisibility = async (id, currentVisibility) => {
+    try {
+      await axios.put(`http://localhost:5000/programs/${id}`, { hidden: !currentVisibility });
+      fetchPrograms();
+    } catch (error) {
+      console.error('Error toggling program visibility:', error);
+    }
+  };
+
   const deleteProgram = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/programs/${id}`);
@@ -61,6 +70,9 @@ const Program = ({ searchResults }) => {
         description: editingProgram.description,
         status: editingProgram.status,
         videoUrl: editingProgram.videoUrl,
+        category: editingProgram.category,
+        type: editingProgram.type,
+        hidden: editingProgram.hidden,
       });
       fetchPrograms();
       handleDialogClose();
@@ -75,15 +87,6 @@ const Program = ({ searchResults }) => {
       ...prevProgram,
       [name]: value,
     }));
-  };
-
-  const toggleVisibility = async (id, currentVisibility) => {
-    try {
-      await axios.put(`http://localhost:5000/programs/${id}`, { hidden: !currentVisibility });
-      fetchPrograms();
-    } catch (error) {
-      console.error('Error toggling program visibility:', error);
-    }
   };
 
   return (
@@ -175,11 +178,38 @@ const Program = ({ searchResults }) => {
           />
           <TextField
             margin="dense"
+            name="status"
+            label="Status"
+            type="text"
+            fullWidth
+            value={editingProgram?.status || ''}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
             name="videoUrl"
             label="Video URL"
             type="text"
             fullWidth
             value={editingProgram?.videoUrl || ''}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="category"
+            label="Category"
+            type="text"
+            fullWidth
+            value={editingProgram?.category || ''}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="type"
+            label="Type"
+            type="text"
+            fullWidth
+            value={editingProgram?.type || ''}
             onChange={handleInputChange}
           />
         </DialogContent>

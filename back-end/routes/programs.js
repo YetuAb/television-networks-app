@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { title, duration, description, status, videoUrl } = req.body;
+    const { title, duration, description, status, videoUrl, category, type } = req.body;
     const newProgram = await prisma.program.create({
       data: {
         title,
@@ -24,6 +24,8 @@ router.post('/', async (req, res) => {
         description, 
         status: Boolean(status),
         videoUrl,
+        category,
+        type,
       },
     });
     res.json(newProgram);
@@ -36,15 +38,18 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, duration, description, status, videoUrl } = req.body;
+    const { title, duration, description, status, videoUrl, category, type, hidden } = req.body;
     const updatedProgram = await prisma.program.update({
       where: { id: parseInt(id, 10) },
       data: {
         title,
         duration,
-        description, 
-        status: Boolean(status),
+        description,
+        status: status !== undefined ? Boolean(status) : undefined,
         videoUrl,
+        category,
+        type,
+        hidden: hidden !== undefined ? Boolean(hidden) : undefined,
       },
     });
     res.json(updatedProgram);
@@ -53,7 +58,6 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 router.delete('/:id', async (req, res) => {
   try {
@@ -85,6 +89,5 @@ router.get('/search', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
 module.exports = router;

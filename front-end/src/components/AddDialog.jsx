@@ -81,6 +81,22 @@ const AddDialog = ({ open, onClose, selectedSection, formValues, handleInputChan
               value={formValues.videoUrl}
               onChange={handleInputChange}
             />
+            <TextField
+              margin="dense"
+              label="Category"
+              name="category"
+              fullWidth
+              value={formValues.category}
+              onChange={handleInputChange}
+            />
+            <TextField
+              margin="dense"
+              label="Type"
+              name="type"
+              fullWidth
+              value={formValues.type}
+              onChange={handleInputChange}
+            />
           </>
         )}
       </DialogContent>
