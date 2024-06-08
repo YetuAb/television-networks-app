@@ -36,6 +36,10 @@ const NowPlaying = () => {
       <Typography>{program.description}</Typography>
       <Box sx={{ width: '100%', marginY: 2 }}>
         <LinearProgress variant="determinate" value={program.progress || 0} />
+        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span>00:00</span>
+          <span>{program.duration}</span>
+        </Typography>
       </Box>
       <Button variant="contained" color="primary">Play</Button>
     </Box>
